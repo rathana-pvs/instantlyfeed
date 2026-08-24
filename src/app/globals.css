@@ -1,0 +1,371 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Associated Press (AP News) Editorial Typography System ──── */
+.article-title-ap,
+.article-title-nyt {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.18 !important;
+}
+
+.article-excerpt-ap,
+.article-excerpt-nyt {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: clamp(16px, 1vw + 12px, 18px) !important;
+  line-height: 1.55 !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+}
+
+/* ─── Seamless Native News Camouflage for AdsKeeper Widgets ───── */
+.mgbox,
+._mgwidget,
+.mgline {
+  background: transparent !important;
+}
+
+/* ─── Design System Variables ─────────────────────────────────── */
+:root {
+  /* Light Mode (Magazine Editorial Style) */
+  --bg-primary: #F8F9FA;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F1F3F5;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6B7280;
+  --accent-red: #D92B3A;
+  --accent-red-bright: #E63946;
+  --accent-red-dim: rgba(217, 43, 58, 0.08);
+  --accent-blue: #1A56DB;
+  --hero-overlay: #FFFFFF;
+  --hero-overlay-rgba: 255, 255, 255;
+  --border: #E5E7EB;
+  --border-subtle: #F3F4F6;
+  --theme-transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+[data-theme="dark"] {
+  /* Dark Mode */
+  --bg-primary: #0F172A;
+  --bg-surface: #1E293B;
+  --bg-card: #1E293B;
+  --bg-hover: #334155;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --accent-red: #F87171;
+  --accent-red-bright: #EF4444;
+  --accent-red-dim: rgba(248, 113, 113, 0.12);
+  --accent-blue: #60A5FA;
+  --hero-overlay: #0F172A;
+  --hero-overlay-rgba: 15, 23, 42;
+  --border: #334155;
+  --border-subtle: #1E293B;
+}
+
+/* System Preference Fallback */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg-primary: #F8F9FA;
+    --bg-surface: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F1F3F5;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6B7280;
+    --accent-red: #D92B3A;
+    --accent-red-bright: #E63946;
+    --accent-red-dim: rgba(217, 43, 58, 0.08);
+    --accent-blue: #1A56DB;
+    --hero-overlay: #FFFFFF;
+    --hero-overlay-rgba: 255, 255, 255;
+    --border: #E5E7EB;
+    --border-subtle: #F3F4F6;
+  }
+}
+
+/* ─── Global Transitions ───────────────────────────────────────── */
+* {
+  transition: var(--theme-transition);
+}
+
+/* ─── Base Styles ─────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Public Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ─── Typography ──────────────────────────────────────────────── */
+.font-display {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+}
+
+.font-card-title {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.font-body {
+  font-family: 'Public Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.font-ui {
+  font-family: 'Public Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+}
+
+.font-mono {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-feature-settings: 'kern' 0, 'liga' 0;
+}
+
+/* Editorial Underline Hover Animation */
+.underline-hover {
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.group:hover .underline-hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  color: var(--accent-red);
+}
+
+/* label-caps */
+.label-caps {
+  font-family: 'Public Sans', 'Inter', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* ─── Article Body Typography ─────────────────────────────────── */
+.article-body {
+  font-family: 'Public Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(16px, 0.9vw + 13px, 18px);
+  line-height: 1.75;
+  color: var(--text-secondary);
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+
+.article-body h2 {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 2rem 0 1rem;
+}
+
+.article-body h3 {
+  font-family: 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.article-body p {
+  margin-bottom: 1.4rem;
+  line-height: 1.75;
+}
+
+/* Pull Quotes */
+.article-body blockquote {
+  font-family: 'Public Sans', 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  border-left: 3px solid var(--accent-red);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  background: var(--bg-surface);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Image Captions */
+.article-body figure figcaption {
+  font-family: 'Public Sans', 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* ─── Ticker Marquee Animation ────────────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  animation: marquee 30s linear infinite;
+  white-space: nowrap;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Reading Progress Bar ────────────────────────────────────── */
+#reading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent-red);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ─── Skeleton Loader ─────────────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.skeleton {
+  background: var(--bg-hover);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* ─── Category Shimmer ────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ─── Scrollbar Styling ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Horizontal Scroll ───────────────────────────────────────── */
+.horizontal-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* ─── Live Pulse Animation ────────────────────────────────────── */
+@keyframes live-pulse {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(217, 43, 58, 0.6);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(217, 43, 58, 0);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(217, 43, 58, 0);
+  }
+}
+
+.live-dot {
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Card Hover Effects ──────────────────────────────────────── */
+.card-hover {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card-hover:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.card-hover:hover .card-image {
+  transform: scale(1.03);
+}
+
+.card-image {
+  transition: transform 0.35s ease;
+}
+
+/* ─── Focus & Selection ───────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-red);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-red-dim);
+  color: var(--text-primary);
+}

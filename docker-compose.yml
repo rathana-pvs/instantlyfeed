@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: instantlyfeed-db
+    restart: always
+    environment:
+      POSTGRES_USER: instantlyfeed
+      POSTGRES_PASSWORD: instantlyfeed123
+      POSTGRES_DB: instantlyfeed
+    ports:
+      - '5435:5432'
+    volumes:
+      - instantlyfeed_db_data:/var/lib/postgresql/data
+
+volumes:
+  instantlyfeed_db_data:
+
