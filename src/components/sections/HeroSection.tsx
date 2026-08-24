@@ -7,6 +7,7 @@ import { Article } from '@/types'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { BreakingBadge } from '@/components/ui/BreakingBadge'
 import { dict } from '@/lib/i18n'
+import { getMediaUrl } from '@/lib/utils'
 
 interface HeroSectionProps {
   hero: Article | null
@@ -16,7 +17,7 @@ interface HeroSectionProps {
 export function HeroSection({ hero, secondary }: HeroSectionProps) {
   if (!hero) return null
 
-  const heroImage = hero.coverImage?.url || 'https://picsum.photos/seed/hero/1200/800'
+  const heroImage = getMediaUrl(hero.coverImage, 'https://picsum.photos/seed/hero/1200/800')
   const heroCategory = typeof hero.category === 'object' && hero.category !== null ? hero.category.name : 'Top Story'
 
   const secondaryTop = secondary[0]

@@ -7,7 +7,7 @@ import { Article } from '@/types'
 import { AuthorChip } from './AuthorChip'
 import { BreakingBadge } from './BreakingBadge'
 import { CategoryBadge } from './CategoryBadge'
-import { truncate } from '@/lib/utils'
+import { truncate, getMediaUrl } from '@/lib/utils'
 import { dict } from '@/lib/i18n'
 
 interface ArticleCardProps {
@@ -26,7 +26,7 @@ export function ArticleCard({
   showExcerpt = true,
 }: ArticleCardProps) {
   const href = `/article/${article.slug}`
-  const imageUrl = article.coverImage?.url || 'https://picsum.photos/seed/default/800/600'
+  const imageUrl = getMediaUrl(article.coverImage)
   const categoryName = typeof article.category === 'object' && article.category !== null ? article.category.name : 'News'
 
   if (size === 'sm') {

@@ -9,6 +9,8 @@ import { RichText } from '@/components/RichText'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 
+import { getMediaUrl } from '@/lib/utils'
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteUrl = envUrl && !envUrl.includes('placeholder.com') ? envUrl : 'https://instantlyfeed.com'
   const title = article.meta?.title || article.title
   const description = article.meta?.description || article.excerpt
-  const ogImageUrl = article.coverImage?.url
+  const ogImageUrl = getMediaUrl(article.coverImage)
 
   return {
     title,
@@ -79,7 +81,7 @@ export default async function ArticlePage({ params }: PageProps) {
   if (!article) notFound()
 
   const relatedArticles = await getRelatedArticles(article.id)
-  const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
+  const heroImage = getMediaUrl(article.coverImage)
 
   const jsonLd = {
     '@context': 'https://schema.org',

@@ -54,3 +54,16 @@ export function slugify(text: string): string {
     .replace(/-+/g, '-')
 }
 
+export function getMediaUrl(media?: any, fallback: string = 'https://picsum.photos/seed/default/800/600'): string {
+  if (!media) return fallback
+  const url = typeof media === 'string' ? media : (media.externalUrl || media.url)
+  if (!url) return fallback
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (url.includes('scraped-') || url.includes('pulefeed-scraped-')) {
+    const filename = url.split('/media/').pop() || url
+    return `https://pulefeed.tech/media/${filename}`
+  }
+  if (url.startsWith('/api/media/file/')) return `/media/${url.replace('/api/media/file/', '')}`
+  return url.startsWith('/') ? url : `/${url}`
+}
+
