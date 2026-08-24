@@ -117,38 +117,36 @@ export async function getArticles(params?: {
   return cachedGetArticles(params)
 }
 
-const cachedGetArticle = unstable_cache(
-  async (slug: string): Promise<Article | null> => {
-    try {
-      const payload = await getPayloadClient()
-      const result = await payload.find({
-        collection: 'articles',
-        where: { slug: { equals: slug } },
-        limit: 1,
-        depth: 2,
-      })
-      const article = (result.docs[0] as unknown as any) || null
-      if (article) {
-        if (article.coverImage && typeof article.coverImage === 'object') {
-          article.coverImage.url = normalizeImageUrl(article.coverImage.url)
-        }
-        return (article as unknown as Article) || null
-      }
-      return mockArticles.find((a) => a.slug === slug) || null
-    } catch (error) {
-      console.warn(`⚠️ Postgres connection failed in getArticle for slug "${slug}" (expected during build):`, error instanceof Error ? error.message : error)
-      return mockArticles.find((a) => a.slug === slug) || null
-    }
-  },
-  ['article'],
-  { tags: ['articles'] }
-)
-
 export async function getArticle(slug: string): Promise<Article | null> {
   if (isBuildTime) {
     return null
   }
-  return cachedGetArticle(slug)
+  return unstable_cache(
+    async (): Promise<Article | null> => {
+      try {
+        const payload = await getPayloadClient()
+        const result = await payload.find({
+          collection: 'articles',
+          where: { slug: { equals: slug } },
+          limit: 1,
+          depth: 2,
+        })
+        const article = (result.docs[0] as unknown as any) || null
+        if (article) {
+          if (article.coverImage && typeof article.coverImage === 'object') {
+            article.coverImage.url = normalizeImageUrl(article.coverImage.url)
+          }
+          return (article as unknown as Article) || null
+        }
+        return null
+      } catch (error) {
+        console.warn(`⚠️ Postgres connection failed in getArticle for slug "${slug}":`, error instanceof Error ? error.message : error)
+        return null
+      }
+    },
+    ['article', slug],
+    { tags: ['articles', `article-${slug}`], revalidate: 60 }
+  )()
 }
 
 const cachedGetFeatured = unstable_cache(
@@ -218,38 +216,36 @@ export async function getBreakingArticles(): Promise<Article[]> {
   return cachedGetBreakingArticles()
 }
 
-const cachedGetRelatedArticles = unstable_cache(
-  async (articleId: string | number): Promise<Article[]> => {
-    try {
-      const payload = await getPayloadClient()
-      const where: any = {
-        status: { equals: 'published' },
-        id: { not_equals: articleId },
-      }
-
-      const result = await payload.find({
-        collection: 'articles',
-        where,
-        limit: 3,
-        depth: 2,
-      })
-      if (result.docs && result.docs.length > 0) {
-        return result.docs as unknown as Article[]
-      }
-      return mockArticles.filter((a) => String(a.id) !== String(articleId)).slice(0, 3)
-    } catch (error) {
-      console.warn(`⚠️ Postgres connection failed in getRelatedArticles for ID "${articleId}" (expected during build):`, error instanceof Error ? error.message : error)
-      return mockArticles.filter((a) => String(a.id) !== String(articleId)).slice(0, 3)
-    }
-  },
-  ['related-articles'],
-  { tags: ['articles'] }
-)
-
 export async function getRelatedArticles(articleId: string | number): Promise<Article[]> {
   if (isBuildTime) {
     return []
   }
-  return cachedGetRelatedArticles(articleId)
+  return unstable_cache(
+    async (): Promise<Article[]> => {
+      try {
+        const payload = await getPayloadClient()
+        const where: any = {
+          status: { equals: 'published' },
+          id: { not_equals: articleId },
+        }
+
+        const result = await payload.find({
+          collection: 'articles',
+          where,
+          limit: 3,
+          depth: 2,
+        })
+        if (result.docs && result.docs.length > 0) {
+          return result.docs as unknown as Article[]
+        }
+        return []
+      } catch (error) {
+        console.warn(`⚠️ Postgres connection failed in getRelatedArticles for ID "${articleId}":`, error instanceof Error ? error.message : error)
+        return []
+      }
+    },
+    ['related-articles', String(articleId)],
+    { tags: ['articles'], revalidate: 60 }
+  )()
 }
 

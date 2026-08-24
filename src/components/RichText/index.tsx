@@ -64,16 +64,16 @@ export const RichText = ({
   }
 
   const primaryWidgetId =
-    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2043077'
+    adWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || ''
 
   const secondaryWidgetId =
-    adWidgetId2 || secondAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2044156'
+    adWidgetId2 || secondAdWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || ''
 
   const tertiaryWidgetId =
-    adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3
+    adWidgetId3 || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || ''
 
   const resolvedFeedWidgetId =
-    feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED
+    feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || ''
 
   // If no primary ad configured or article is too short, render plain
   if (!primaryWidgetId || nodes.length < 2) {

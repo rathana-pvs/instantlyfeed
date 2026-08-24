@@ -69,6 +69,8 @@ const MOCK_ADS = [
 let mgcLoadFired = false
 
 export default function AdskeeperWidget({ widgetId, className = '', adType, onlyShowOn }: AdskeeperWidgetProps) {
+  if (!widgetId) return null
+
   const isDev = process.env.NODE_ENV === 'development'
   const containerRef = useRef<HTMLDivElement>(null)
   const slotRef = useRef<HTMLDivElement>(null)
