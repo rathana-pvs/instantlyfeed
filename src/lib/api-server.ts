@@ -10,10 +10,8 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_S
 /** Ensure a cover image URL is always properly formatted. */
 function normalizeImageUrl(url: string | undefined | null): string | undefined {
   if (!url) return undefined
-  // For local media files, return relative /media path so it works across any port / domain
-  if (url.includes('/media/pulefeed-scraped-') || url.includes('/media/scraped-')) {
-    const filename = url.split('/media/').pop()
-    return `/media/${filename}`
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
   }
   if (url.startsWith('/api/media/file/')) {
     return `/media/${url.replace('/api/media/file/', '')}`

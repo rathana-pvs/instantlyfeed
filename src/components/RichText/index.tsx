@@ -75,15 +75,6 @@ export const RichText = ({
   const resolvedFeedWidgetId =
     feedWidgetId || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || ''
 
-  // If no primary ad configured or article is too short, render plain
-  if (!primaryWidgetId || nodes.length < 2) {
-    return (
-      <div className={`rich-text ${className || ''}`}>
-        {serializeLexical(nodes)}
-      </div>
-    )
-  }
-
   // Count total paragraphs and find exact paragraph boundary indices
   let paragraphCount = 0
   let p1EndIndex = nodes.length // index after paragraph 1
@@ -99,14 +90,25 @@ export const RichText = ({
     }
   }
 
+  // If article is very short (less than 2 nodes or only 1 paragraph), render plain
+  if (nodes.length < 2 || paragraphCount < 2) {
+    return (
+      <div className={`rich-text ${className || ''}`}>
+        {serializeLexical(nodes)}
+      </div>
+    )
+  }
+
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
   topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
-  topElements.push(
-    <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
-      <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
-    </div>
-  )
+  if (primaryWidgetId) {
+    topElements.push(
+      <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
+        <AdskeeperWidget key={`ad-inarticle-1`} widgetId={primaryWidgetId} className="!my-0" />
+      </div>
+    )
+  }
 
   // ─── Assemble bottomElements (shown when expanded) ───
   const bottomElements: React.ReactNode[] = []
