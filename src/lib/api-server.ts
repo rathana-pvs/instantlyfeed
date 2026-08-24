@@ -13,6 +13,10 @@ function normalizeImageUrl(url: string | undefined | null): string | undefined {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url
   }
+  if (url.startsWith('/media/scraped-') || url.startsWith('/media/pulefeed-scraped-') || url.includes('scraped-')) {
+    const filename = url.split('/media/').pop() || url
+    return `https://pulefeed.tech/media/${filename}`
+  }
   if (url.startsWith('/api/media/file/')) {
     return `/media/${url.replace('/api/media/file/', '')}`
   }
