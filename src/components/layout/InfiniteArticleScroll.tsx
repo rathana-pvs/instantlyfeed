@@ -9,7 +9,7 @@ import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
 import { getArticles } from '@/lib/api'
 import { ArticleCard } from '@/components/ui/ArticleCard'
 import { dict } from '@/lib/i18n'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getMediaUrl } from '@/lib/utils'
 
 interface InfiniteArticleScrollProps {
   initialArticle: Article
@@ -127,7 +127,7 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
   return (
     <div>
       {articles.map((article, index) => {
-        const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
+        const heroImage = getMediaUrl(article.coverImage, 'https://picsum.photos/seed/article/1400/900')
 
         return (
           <article 

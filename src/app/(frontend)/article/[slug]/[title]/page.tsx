@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const siteUrl = envUrl && !envUrl.includes('placeholder.com') ? envUrl : 'https://instantlyfeed.com'
   const title = article.meta?.title || article.title
   const description = article.meta?.description || article.excerpt
-  const ogImageUrl = article.coverImage?.url
+  const ogImageUrl = getMediaUrl(article.coverImage)
 
   return {
     title,
