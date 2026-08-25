@@ -32,6 +32,15 @@ async function scrapeUrlDirectly(url: string) {
               $('h1').first().text() ||
               $('title').text()
   title = title?.trim() || ''
+  title = title
+    .replace(/\s*–\s*arnewspost\.info$/i, '')
+    .replace(/\s*-\s*arnewspost\.info$/i, '')
+    .replace(/\s*–\s*instantlyfeed$/i, '')
+    .replace(/\s*-\s*instantlyfeed$/i, '')
+    .replace(/\s*–\s*pulefeed$/i, '')
+    .replace(/\s*-\s*pulefeed$/i, '')
+    .replace(/[…\.\s]+$/, '')
+    .trim()
 
   // 2. Extract Excerpt / Description
   let excerpt = $('meta[property="og:description"]').attr('content') ||
@@ -41,7 +50,8 @@ async function scrapeUrlDirectly(url: string) {
   excerpt = excerpt.trim()
 
   // 3. Extract main content tags in order
-  let container = $('article')
+  let container = $('.entry-content')
+  if (container.length === 0) container = $('article')
   if (container.length === 0) container = $('main')
   if (container.length === 0) container = $('[itemprop="articleBody"]')
   if (container.length === 0) {
@@ -68,15 +78,23 @@ async function scrapeUrlDirectly(url: string) {
     const tag = element.tagName?.toLowerCase()
     if (!tag) return
 
-    // 1. Heading
+    // 1. Heading or long paragraph disguised as heading (common in WP themes)
     if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)) {
       const text = $(element).text().trim()
       if (text.length > 3) {
-        rawBlocks.push({
-          type: 'heading',
-          tag: tag === 'h1' ? 'h2' : tag,
-          text
-        })
+        if (text.length > 80 || text.split(/\s+/).length > 12) {
+          rawBlocks.push({
+            type: 'paragraph',
+            text,
+            children: [{ type: 'text', text }]
+          })
+        } else {
+          rawBlocks.push({
+            type: 'heading',
+            tag: tag === 'h1' ? 'h2' : tag,
+            text
+          })
+        }
       }
       return
     }
@@ -315,15 +333,16 @@ async function scrapeUrlDirectly(url: string) {
   let scrapedImageUrl = $('meta[property="og:image"]').attr('content') ||
                         $('meta[name="twitter:image"]').attr('content') ||
                         $('link[rel="image_src"]').attr('href') ||
+                        $('.wp-post-image, .attachment-post-thumbnail, .attachment-hitmag-featured, .featured-image img, .entry-thumbnail img').first().attr('src') ||
                         ''
   
   if (scrapedImageUrl) {
     scrapedImageUrl = resolveUrl(url, scrapedImageUrl)
   } else {
-    const articleImages = $('article img, main img, .content img, .post img, #content img')
+    const articleImages = $('article img, main img, .entry-content img, .content img, .post img, #content img')
     let foundImg = ''
     articleImages.each((_, el) => {
-      const src = $(el).attr('src')
+      const src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('data-lazy-src')
       if (src) {
         const resolved = resolveUrl(url, src)
         if (
@@ -694,7 +713,7 @@ const googleAI = createGoogleGenerativeAI({
 })
 
 const PRIMARY_MODEL_ID = 'gemini-3.5-flash-lite'
-const FALLBACK_MODEL_ID = 'gemini-2.5-flash'
+const FALLBACK_MODEL_ID = 'gemini-3.6-flash'
 
 const primaryModel = googleAI(PRIMARY_MODEL_ID)
 const fallbackModel = googleAI(FALLBACK_MODEL_ID)
