@@ -137,9 +137,9 @@ export const AIAssistant: React.FC = () => {
       dispatchFields({ type: 'UPDATE', path: 'og.metaDescription', value, valid: true })
       dispatchFields({ type: 'UPDATE', path: 'meta.description', value, valid: true })
     } else if (fieldName === 'coverImage') {
-      dispatchFields({ type: 'UPDATE', path: 'coverImage', value, valid: true })
-      dispatchFields({ type: 'UPDATE', path: 'og.ogImage', value, valid: true })
-      dispatchFields({ type: 'UPDATE', path: 'meta.image', value, valid: true })
+      dispatchFields({ type: 'UPDATE', path: 'coverImage', value, initialValue: value, valid: true })
+      dispatchFields({ type: 'UPDATE', path: 'og.ogImage', value, initialValue: value, valid: true })
+      dispatchFields({ type: 'UPDATE', path: 'meta.image', value, initialValue: value, valid: true })
     } else if (fieldName === 'content') {
       let lexicalValue = typeof value === 'string' ? convertTextToLexicalJson(value) : JSON.parse(JSON.stringify(value))
       if (lexicalValue?.root?.children && result?.title) {

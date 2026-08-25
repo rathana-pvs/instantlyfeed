@@ -60,15 +60,10 @@ export const Media: CollectionConfig = {
           doc.url = doc.externalUrl
         } else if (doc.url && (doc.url.startsWith('http://') || doc.url.startsWith('https://'))) {
           // Keep external URLs as-is
-        } else if (doc.filename && (doc.filename.includes('scraped-') || doc.filename.includes('pulefeed-scraped-'))) {
-          doc.url = `https://pulefeed.tech/media/${doc.filename}`
         } else if (doc.filename) {
           doc.url = `/media/${doc.filename}`
         } else if (doc.url && doc.url.startsWith('/api/media/file/')) {
           doc.url = `/media/${doc.url.replace('/api/media/file/', '')}`
-        } else if (doc.url && doc.url.includes('/media/scraped-')) {
-          const filename = doc.url.split('/media/').pop()
-          doc.url = `https://pulefeed.tech/media/${filename}`
         }
         return doc
       },

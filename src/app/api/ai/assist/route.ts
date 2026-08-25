@@ -773,13 +773,17 @@ export async function POST(req: NextRequest) {
             const buffer = Buffer.from(arrayBuffer)
             const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
             let ext = contentType.split('/')[1] || 'jpg'
-            ext = ext.split(';')[0].trim()
+            ext = ext.split(';')[0].replace('+xml', '').trim()
+            if (!['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'].includes(ext)) {
+              ext = 'jpg'
+            }
             const filename = `scraped-${Date.now()}.${ext}`
             
             const mediaDoc = await payload.create({
               collection: 'media',
               data: {
                 alt: result.title || 'Scraped Image',
+                source: 'local',
               },
               file: {
                 data: buffer,
@@ -822,13 +826,17 @@ export async function POST(req: NextRequest) {
               const buffer = Buffer.from(arrayBuffer)
               const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
               let ext = contentType.split('/')[1] || 'jpg'
-              ext = ext.split(';')[0].trim()
+              ext = ext.split(';')[0].replace('+xml', '').trim()
+              if (!['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'].includes(ext)) {
+                ext = 'jpg'
+              }
               const filename = `scraped-inline-${Date.now()}-${Math.floor(Math.random() * 1000)}.${ext}`
               
               const mediaDoc = await payload.create({
                 collection: 'media',
                 data: {
                   alt: block.alt || result.title || 'Scraped Inline Image',
+                  source: 'local',
                 },
                 file: {
                   data: buffer,

@@ -214,7 +214,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
             )}
 
             {/* Rich Text Body with Phased In-Article Ads */}
-            <div className="article-body prose prose-invert prose-lg max-w-none mb-4 sm:mb-12">
+            <div className="article-body prose prose-invert prose-lg max-w-none mb-2">
               {article.content ? (
                 <RichText
                   content={article.content}
@@ -230,23 +230,11 @@ export default async function DynamicArticlePage({ params }: PageProps) {
               )}
             </div>
 
-            {/* Attribution / Source */}
-            {article.credit && (
-               <div className="mb-12 py-6 border-t border-b border-[var(--border)] flex items-center gap-4">
-                  <span className="font-mono font-bold text-[9px] uppercase tracking-[0.2em]" style={{ color: 'var(--accent-red)' }}>
-                    SOURCE
-                  </span>
-                  <p className="font-mono text-xs italic" style={{ color: 'var(--text-muted)' }}>
-                    {article.credit}
-                  </p>
-               </div>
-            )}
-
             {/* Under-article Native Recommendations Widget (Desktop Only) */}
-            <AdskeeperWidget widgetId={widgetUnderArticle} onlyShowOn="desktop" className="hidden lg:block my-8" />
+            <AdskeeperWidget widgetId={widgetUnderArticle} onlyShowOn="desktop" className="hidden lg:block my-4" />
 
             {/* Feed Bottom Content Widget - Inside main content column */}
-            <div className="mt-8 border-t border-[var(--border)] pt-4">
+            <div className="mt-4">
                <AdskeeperWidget widgetId={widgetBottomFeed} className="!my-0" />
             </div>
           </article>

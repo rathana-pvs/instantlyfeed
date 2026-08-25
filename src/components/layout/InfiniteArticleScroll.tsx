@@ -214,7 +214,7 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                   </div>
 
                   {/* Rich Text Body */}
-                  <div className="article-body prose prose-invert prose-lg max-w-none mb-12">
+                  <div className="article-body prose prose-invert prose-lg max-w-none mb-2">
                     {article.content ? (
                       <RichText
                         content={article.content}
@@ -228,22 +228,8 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                     )}
                   </div>
 
-                  {/* Attribution / Source */}
-                  {article.credit && (
-                     <div className="mb-8 py-6 border-t border-b border-[var(--border)] flex items-center gap-4">
-                        <span className="font-mono font-bold text-[9px] uppercase tracking-[0.2em] text-[var(--accent-red)]">
-                          SOURCE
-                        </span>
-                        <p className="font-mono text-xs italic text-[var(--text-muted)]">
-                          {article.credit}
-                        </p>
-                     </div>
-                  )}
-
-
-
                   {/* Under-article Native Recommendations Widget (ID: 2043079 - Desktop Only) */}
-                  <AdskeeperWidget widgetId="2043079" onlyShowOn="desktop" className="hidden lg:block my-8" />
+                  <AdskeeperWidget widgetId="2043079" onlyShowOn="desktop" className="hidden lg:block my-4" />
 
                   {/* Related Articles — inside main column so sidebar stays visible */}
                   {index === 0 && initialRelated && initialRelated.length > 0 && (
