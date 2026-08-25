@@ -61,7 +61,7 @@ export function getMediaUrl(media?: any, fallback: string = 'https://picsum.phot
   if (url.startsWith('http://') || url.startsWith('https://')) return url
   if (url.includes('scraped-') || url.includes('pulefeed-scraped-')) {
     const filename = url.split('/media/').pop() || url
-    return `https://pulefeed.tech/media/${filename}`
+    return `/media/${filename}`
   }
   if (url.startsWith('/api/media/file/')) return `/media/${url.replace('/api/media/file/', '')}`
   return url.startsWith('/') ? url : `/${url}`
