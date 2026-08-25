@@ -102,8 +102,6 @@ export default async function DynamicArticlePage({ params }: PageProps) {
     console.error('Error tracking share link click:', e)
   }
 
-  const heroImage = article.coverImage?.url || 'https://picsum.photos/seed/article/1400/900'
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
