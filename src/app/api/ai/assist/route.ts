@@ -33,13 +33,15 @@ async function scrapeUrlDirectly(url: string) {
               $('title').text()
   title = title?.trim() || ''
   title = title
+    .replace(/^[\p{Emoji}\p{Extended_Pictographic}\u200d\s]+/u, '')
     .replace(/\s*–\s*arnewspost\.info$/i, '')
     .replace(/\s*-\s*arnewspost\.info$/i, '')
     .replace(/\s*–\s*instantlyfeed$/i, '')
     .replace(/\s*-\s*instantlyfeed$/i, '')
     .replace(/\s*–\s*pulefeed$/i, '')
     .replace(/\s*-\s*pulefeed$/i, '')
-    .replace(/[…\.\s]+$/, '')
+    .replace(/[\.…\s]+$/, '')
+    .replace(/^[–—\-\:\s]+/, '')
     .trim()
 
   // 2. Extract Excerpt / Description
@@ -82,6 +84,13 @@ async function scrapeUrlDirectly(url: string) {
     if (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag)) {
       const text = $(element).text().trim()
       if (text.length > 3) {
+        // Skip if heading duplicates the article title
+        const cleanHeading = text.toLowerCase().replace(/[^a-z0-9]/g, '')
+        const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]/g, '')
+        if (cleanHeading && cleanTitle && (cleanHeading === cleanTitle || cleanHeading.startsWith(cleanTitle.substring(0, 30)))) {
+          return
+        }
+
         if (text.length > 80 || text.split(/\s+/).length > 12) {
           rawBlocks.push({
             type: 'paragraph',
@@ -934,7 +943,7 @@ export async function POST(req: NextRequest) {
           if (rawParagraphsText.length > 50) {
             const aiPrompt = `Given the news article title "${result.title}" and text content:\n"${rawParagraphsText.substring(0, 2000)}"\n\nSummarize and reformat into a complete news summary adhering strictly to these rules:
 1. "excerpt": A punchy, high-engagement lead summary strictly under 160 characters.
-2. "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST be strictly between 250 and 350 words. Each paragraph MUST be at most 55 words long. Do NOT duplicate title.
+2. "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST strictly fall between 250 and 350 words (never under 250 words; if the source article is short, provide comprehensive journalistic background, context, and key implications to reach at least 250 words). Each paragraph MUST be at most 55 words long. Do NOT duplicate title.
 3. "tags": ["3-5 relevant lowercase tags"]
 4. "metaTitle": SEO title strictly 50-60 characters ending with - InstantlyFeed.
 5. "metaDescription": SEO meta description strictly 100-150 characters.
@@ -998,6 +1007,10 @@ Return valid JSON with exact keys: { "excerpt", "content", "tags", "metaTitle", 
       }
       delete result.blocks
 
+      if (!result.excerpt && result.title) {
+        result.excerpt = result.title.length > 155 ? result.title.substring(0, 152) + '...' : result.title
+      }
+
       const enforced = enforceSeoLimits(result)
       return NextResponse.json({ success: true, data: enforced })
     }
@@ -1011,7 +1024,7 @@ Return valid JSON with exact keys: { "excerpt", "content", "tags", "metaTitle", 
     if (action === 'full') {
       prompt = `Given the article title "${title}"${content ? ` and notes: "${content}"` : ''}, generate a complete summary news article adhering to these rules:
 - "excerpt": A punchy, high-engagement lead summary strictly under 160 characters.
-- "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST be between 250 and 350 words. Each paragraph MUST be at most 55 words long.
+- "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST strictly fall between 250 and 350 words (never under 250 words; if notes are brief, provide comprehensive context and background detail to reach at least 250 words). Each paragraph MUST be at most 55 words long.
 - "tags": ["3-5 relevant lowercase tags"]
 - "metaTitle": SEO title strictly 50-60 characters ending with - InstantlyFeed.
 - "metaDescription": SEO meta description strictly 100-150 characters.
@@ -1020,7 +1033,7 @@ Return JSON with exact keys: { "excerpt", "content", "tags", "metaTitle", "metaD
     } else if (action === 'content_only') {
       prompt = `Given the article title "${title}"${content ? ` and notes: "${content}"` : ''}, generate the summary article content adhering to these rules:
 - "excerpt": A punchy, high-engagement lead summary strictly under 160 characters.
-- "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST be between 250 and 350 words. Each paragraph MUST be at most 55 words long.
+- "content": Summary body of 6 to 8 short paragraphs (no H2/H3 subheadings). Total word count MUST strictly fall between 250 and 350 words (never under 250 words; if notes are brief, provide comprehensive context and background detail to reach at least 250 words). Each paragraph MUST be at most 55 words long.
 
 Return JSON with exact keys: { "excerpt", "content" }`
     } else if (action === 'seo_only') {
