@@ -11,12 +11,12 @@ For the news application, content summarization and AI formatting follow strict 
 - **Subheadings**:
   Do NOT include any H2 or H3 subheadings in short summary articles—use clean, readable paragraphs.
 - **Total Word Count**:
-  The entire summary body content **MUST be strictly between 120 and 140 words**.
+  The entire summary body content **MUST be strictly between 250 and 350 words**.
 - **Paragraph Constraints**:
-  Write **EXACTLY 4 paragraphs** (no more, no less).
-  Each paragraph **MUST be at most 35 words long**.
+  Write **6 to 8 concise paragraphs**.
+  Each paragraph **MUST be at most 55 words long**.
 - **SEO Metadata Limits**:
-  - Meta Title: **50–60 characters** (including `- Pulefeed` suffix).
+  - Meta Title: **50–60 characters** (including `- InstantlyFeed` suffix).
   - Meta Description: **100–150 characters**.
 
 ---

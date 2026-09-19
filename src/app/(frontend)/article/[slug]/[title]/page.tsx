@@ -60,12 +60,10 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   const envUrl = process.env.NEXT_PUBLIC_SITE_URL
   const siteUrl = envUrl && !envUrl.includes('placeholder.com') ? envUrl : 'https://instantlyfeed.com'
   
-  const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || ''
-  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || ''
-  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || ''
-  const widgetFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || ''
-  const widgetUnderArticle = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_UNDER_ARTICLE || ''
-  const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || ''
+  const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2073359'
+  const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2073352'
+  const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2073357'
+  const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2073350'
 
   const article = await getArticle(slug)
   if (!article) notFound()
@@ -221,7 +219,7 @@ export default async function DynamicArticlePage({ params }: PageProps) {
                   articleTitle={article.title}
                   adWidgetId={widgetInArticle1}
                   adWidgetId2={widgetInArticle2}
-                  feedWidgetId={widgetFeed}
+                  feedWidgetId={widgetBottomFeed}
                 />
               ) : (
                 <p className="text-xl leading-relaxed mt-4 italic opacity-50">
@@ -229,9 +227,6 @@ export default async function DynamicArticlePage({ params }: PageProps) {
                 </p>
               )}
             </div>
-
-            {/* Under-article Native Recommendations Widget (Desktop Only) */}
-            <AdskeeperWidget widgetId={widgetUnderArticle} onlyShowOn="desktop" className="hidden lg:block my-4" />
 
             {/* Feed Bottom Content Widget - Inside main content column */}
             <div className="mt-4">

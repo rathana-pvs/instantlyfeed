@@ -71,7 +71,7 @@ export default async function HomePage() {
 
       {/* Adskeeper Feed Widget */}
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 my-6">
-        <AdskeeperWidget widgetId="2043075" />
+        <AdskeeperWidget widgetId={process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2073350'} />
       </div>
 
       {/* Opinion & Commentary */}

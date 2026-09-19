@@ -63,7 +63,7 @@ const MOCK_ADS = [
 
 // Module-level flag: _mgc.load must only fire ONCE per page session.
 // Calling it per-widget causes Adskeeper to treat the second+ calls as
-// duplicates and silently skip already-scanned slots (e.g. widget 2044156).
+// duplicates and silently skip already-scanned slots (e.g. widget 2073357).
 // Instead, the FIRST widget to enter the viewport triggers the global scan;
 // Adskeeper then fills all slots — including below-fold ones — on its own.
 let mgcLoadFired = false
@@ -123,7 +123,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
               // Only call _mgc.load once across ALL widget instances.
               // Adskeeper scans every [data-type="_mgwidget"] in the DOM on
               // this single call — subsequent calls are no-ops in its internal
-              // queue, causing below-fold slots like 2044156 to never fill.
+              // queue, causing below-fold slots like 2073357 to never fill.
               if (!mgcLoadFired) {
                 mgcLoadFired = true
                 window._mgq = window._mgq || []
@@ -211,8 +211,8 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       )
     }
 
-    if (widgetId === '2043077') {
-      // In-Article Top: 2-column compact list (replicates ArticleCard size="sm")
+    if (widgetId === '2073352') {
+      // In-Article Top (in_article_1): 2-column compact list (replicates ArticleCard size="sm")
       return (
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
@@ -242,10 +242,8 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       )
     }
 
-
-    if (widgetId === '2044156') {
-      // In-Article Mid (second injection, long reads) — same layout as 2043077
-      // but uses different mock ads so both slots are distinguishable in dev.
+    if (widgetId === '2073357') {
+      // In-Article Mid (in_article_2): second injection, revealed on continue reading
       return (
         <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-8 ${className}`}>
           <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
@@ -275,39 +273,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
       )
     }
 
-
-    if (widgetId === '2043079') {
-      // Under-Article: 2x2 grid (replicates ArticleCard size="md" layout)
-      return (
-        <div className={`ads-container border border-dashed border-[var(--border)] bg-[var(--bg-card)] rounded-md p-6 my-10 ${className}`}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.2em] opacity-40 block text-center mb-4">
-            [Local Test Mode] Adskeeper Under-Article Grid ({widgetId})
-          </span>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {MOCK_ADS.slice(3, 7).map((ad) => (
-              <article key={ad.id} className="group border-b border-[var(--border)] sm:border-0 pb-5 sm:pb-0 cursor-pointer transition-all">
-                <div className="relative w-full overflow-hidden rounded" style={{ aspectRatio: '16/9' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={ad.image} alt={ad.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
-                </div>
-                <div className="pt-4">
-                  <h3 className="font-card-title leading-tight mb-2 line-clamp-3 text-[var(--text-primary)]" style={{ fontSize: '15px' }}>
-                    <span className="underline-hover pb-[2px]">{ad.title}</span>
-                  </h3>
-                  <div className="font-mono flex items-center gap-1.5 mt-1" style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-                    <span className="text-[var(--accent-red)] font-bold">Ad</span>
-                    <span>·</span>
-                    <span className="truncate max-w-[120px]">{ad.brand}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    // Default or Feed Widget (2043075): Single-column vertical native feed (realistic Adskeeper feed layout)
+    // Default or Feed Widget (2073350): Single-column vertical native feed (realistic Adskeeper feed layout)
     return (
       <div className={`ads-container ${className}`}>
         {/* Dev label */}

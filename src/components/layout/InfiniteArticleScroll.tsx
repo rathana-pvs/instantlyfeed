@@ -28,7 +28,7 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
   const loadedIds = useRef<(string | number)[]>([initialArticle.id])
   const observerTargetRef = useRef<HTMLDivElement>(null)
 
-  // Track breakpoint in JS so only ONE instance of widget 2043076 is ever
+  // Track breakpoint in JS so only ONE instance of widget 2073359 is ever
   // mounted in the DOM at a time (CSS-only hiding still renders both divs,
   // which causes Adskeeper to find duplicate slot IDs and fill both).
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null)
@@ -218,8 +218,8 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                     {article.content ? (
                       <RichText
                         content={article.content}
-                        adWidgetId="2043077"
-                        secondAdWidgetId="2044156"
+                        adWidgetId="2073352"
+                        secondAdWidgetId="2073357"
                       />
                     ) : (
                       <p className="text-xl leading-relaxed mt-4 italic opacity-50">
@@ -227,9 +227,6 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                       </p>
                     )}
                   </div>
-
-                  {/* Under-article Native Recommendations Widget (ID: 2043079 - Desktop Only) */}
-                  <AdskeeperWidget widgetId="2043079" onlyShowOn="desktop" className="hidden lg:block my-4" />
 
                   {/* Related Articles — inside main column so sidebar stays visible */}
                   {index === 0 && initialRelated && initialRelated.length > 0 && (
@@ -253,7 +250,7 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                   <aside className="lg:col-span-4">
                     <div className="sticky top-24">
                       <AdskeeperWidget
-                        widgetId="2043076"
+                        widgetId="2073359"
                         adType="sidebar"
                         onlyShowOn="desktop"
                       />
@@ -273,7 +270,7 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
       {/* Feed Widget — rendered ONCE at the very bottom, outside the article loop */}
       {!hasMore && (
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6">
-          <AdskeeperWidget widgetId="2043075" />
+          <AdskeeperWidget widgetId="2073350" />
         </div>
       )}
     </div>
