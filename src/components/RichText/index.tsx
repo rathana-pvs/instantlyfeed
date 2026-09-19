@@ -90,8 +90,8 @@ export const RichText = ({
     }
   }
 
-  // If article is very short (less than 2 nodes or only 1 paragraph), render plain
-  if (nodes.length < 2 || paragraphCount < 2) {
+  // If article is very short (less than 3 nodes or less than 3 paragraphs), render plain
+  if (nodes.length < 3 || paragraphCount < 3) {
     return (
       <div className={`rich-text ${className || ''}`}>
         {serializeLexical(nodes)}
@@ -101,7 +101,11 @@ export const RichText = ({
 
   // ─── Assemble topElements (shown before "Continue Reading") ───
   const topElements: React.ReactNode[] = []
+
+  // Paragraph 1
   topElements.push(...serializeLexical(nodes.slice(0, p1EndIndex), 'top-p1'))
+
+  // In-Article Ad 1
   if (primaryWidgetId) {
     topElements.push(
       <div key={`ad-inarticle-1-wrap`} className="my-3 w-full flex justify-center items-center">
@@ -110,21 +114,14 @@ export const RichText = ({
     )
   }
 
-  // ─── Assemble bottomElements (shown when expanded) ───
-  const bottomElements: React.ReactNode[] = []
-
-  // Paragraph 2
+  // Paragraph 2 (Fully visible before Continue Reading button)
   const p2Nodes = nodes.slice(p1EndIndex, p2EndIndex)
   if (p2Nodes.length > 0) {
-    bottomElements.push(...serializeLexical(p2Nodes, 'bot-p2'))
-    if (secondaryWidgetId) {
-      bottomElements.push(
-        <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
-          <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
-        </div>
-      )
-    }
+    topElements.push(...serializeLexical(p2Nodes, 'top-p2'))
   }
+
+  // ─── Assemble bottomElements (shown when expanded) ───
+  const bottomElements: React.ReactNode[] = []
 
   // Paragraph 3
   const p3Nodes = nodes.slice(p2EndIndex, p3EndIndex)
@@ -132,21 +129,31 @@ export const RichText = ({
     bottomElements.push(...serializeLexical(p3Nodes, 'bot-p3'))
   }
 
-  // Paragraph 4+ (rendered after Feed Ads if present)
-  const restNodes = nodes.slice(p3EndIndex)
-  if (restNodes.length > 0) {
-    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-p5'))
+  // In-Article Ad 2 (Rendered after Paragraph 3)
+  if (secondaryWidgetId) {
+    bottomElements.push(
+      <div key={`ad-inarticle-2-wrap`} className="my-4 w-full flex justify-center items-center">
+        <AdskeeperWidget key={`ad-inarticle-2`} widgetId={secondaryWidgetId} className="!my-0" />
+      </div>
+    )
   }
 
-  // ─── Collapsed state: teaser preview + Continue Reading button ───
+  // Paragraph 4+
+  const restNodes = nodes.slice(p3EndIndex)
+  if (restNodes.length > 0) {
+    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-plus'))
+  }
+
+  // ─── Collapsed state: teaser preview on Paragraph 3 + Continue Reading button ───
   if (!isExpanded) {
-    const teaserElement = bottomElements[0]
+    const teaserNodes = p3Nodes.length > 0 ? serializeLexical(p3Nodes, 'teaser-p3') : []
+    const teaserElement = teaserNodes[0]
 
     return (
       <div className={`rich-text relative ${className || ''}`}>
         {topElements}
 
-        {/* Teaser text with blur filter and gradient shading mask */}
+        {/* Teaser text with blur filter and gradient shading mask (on Paragraph 3) */}
         {teaserElement && (
           <div className="relative overflow-hidden h-[5.5rem] max-h-[90px] mt-4 mb-3 select-none pointer-events-none">
             <div className="blur-[1.5px] opacity-75 line-clamp-3">
