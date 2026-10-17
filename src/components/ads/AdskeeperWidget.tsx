@@ -101,8 +101,9 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
 
   // Step 1: Observe the outer container — only mount the slot into the DOM when within 250px of viewport
   useEffect(() => {
-    if (isDev || !containerRef.current) return
-    if (onlyShowOn === 'desktop' && !window.matchMedia('(min-width: 1024px)').matches) return
+    // Desktop-only widgets render no container until the media query resolves.
+    // Wait for that state so this effect reruns once the container actually exists.
+    if (isDev || isAllowedDevice !== true || !containerRef.current) return
 
     const el = containerRef.current
     const observer = new IntersectionObserver(
@@ -116,7 +117,7 @@ export default function AdskeeperWidget({ widgetId, className = '', adType, only
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [isDev, onlyShowOn])
+  }, [isDev, isAllowedDevice])
 
   // Step 2: Once inView is true, slot is mounted in DOM — trigger Adskeeper scan & observe height
   useEffect(() => {
