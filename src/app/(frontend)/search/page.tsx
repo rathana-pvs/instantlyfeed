@@ -226,7 +226,7 @@ export default function SearchPage() {
                       {article.excerpt}
                     </p>
                     <div className="mt-auto">
-                       <AuthorChip author={article.author || null} date={article.publishedAt} readTime={article.readTime} size="sm" />
+                       <AuthorChip author={article.author || null} date={article.publishedAt} size="sm" />
                     </div>
                   </div>
                 </Link>

@@ -7,7 +7,7 @@ export function LiveBadge({ className }: { className?: string }) {
       style={{
         background: 'var(--accent-red)',
         color: '#fff',
-        fontFamily: 'IBM Plex Mono, monospace',
+        fontFamily: 'var(--font-plex-mono), monospace',
         fontSize: '10px',
         fontWeight: 600,
         letterSpacing: '0.1em',

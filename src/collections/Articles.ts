@@ -4,18 +4,6 @@ import { VideoEmbed } from '../blocks/VideoEmbed'
 import { slugify } from '../lib/utils'
 import { revalidateTag } from 'next/cache'
 
-function countLexicalWords(node: any): number {
-  if (!node) return 0
-  let count = 0
-  if (node.type === 'text' && typeof node.text === 'string') {
-    count += node.text.split(/\s+/).filter(Boolean).length
-  }
-  if (Array.isArray(node.children)) {
-    for (const child of node.children) count += countLexicalWords(child)
-  }
-  return count
-}
-
 export const Articles: CollectionConfig = {
   slug: 'articles',
   admin: {
@@ -46,13 +34,6 @@ export const Articles: CollectionConfig = {
           data.slug = generatedSlug || `article-${Date.now()}`
         }
         
-        if (data.content) {
-          // Count only the words in Lexical text nodes — stringifying the whole
-          // JSON tree counted keys/format metadata and inflated read time.
-          const wordCount = countLexicalWords(data.content?.root)
-          data.readTime = Math.max(1, Math.ceil(wordCount / 200))
-        }
-
         // Ensure og group exists and sync fields
         if (!data.og) {
           data.og = {}
@@ -164,7 +145,9 @@ export const Articles: CollectionConfig = {
       defaultValue: () => new Date(),
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
-    { name: 'readTime', type: 'number', admin: { position: 'sidebar', description: 'Auto-calculated' } },
+    // Deprecated: read time is no longer calculated or shown. Kept (hidden) so the
+    // existing read_time DB column stays in sync without a migration.
+    { name: 'readTime', type: 'number', admin: { hidden: true } },
     {
       name: 'og',
       label: 'OG',

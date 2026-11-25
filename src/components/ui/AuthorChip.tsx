@@ -2,17 +2,15 @@
 
 import { formatDate } from '@/lib/utils'
 import { Author } from '@/types'
-import { dict } from '@/lib/i18n'
 
 interface AuthorChipProps {
   author?: Author | null
   date?: string
-  readTime?: number
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
-export function AuthorChip({ author, date, readTime, size = 'md', className }: AuthorChipProps) {
+export function AuthorChip({ author, date, size = 'md', className }: AuthorChipProps) {
   if (!author || typeof author === 'string') return null
   if (!author.name) return null // Ensure we have at least the name
 
@@ -25,12 +23,6 @@ export function AuthorChip({ author, date, readTime, size = 'md', className }: A
         <>
           <span className="opacity-40">·</span>
           <span suppressHydrationWarning>{formatDate(date, 'MMM d, yyyy')}</span>
-        </>
-      )}
-      {readTime && (
-        <>
-          <span className="opacity-40">·</span>
-          <span>{readTime} {dict.minRead}</span>
         </>
       )}
     </div>

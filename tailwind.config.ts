@@ -24,17 +24,17 @@ const config: Config = {
         'border-subtle': 'var(--border-subtle)',
       },
       fontFamily: {
-        display: ['Public Sans', 'Inter', 'system-ui', 'sans-serif'],
-        serif: ['Public Sans', 'Inter', 'system-ui', 'sans-serif'],
-        'source-serif': ['Public Sans', 'Inter', 'system-ui', 'sans-serif'],
-        sans: ['Public Sans', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'monospace'],
+        display: ['var(--font-public-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-public-sans)', 'system-ui', 'sans-serif'],
+        'source-serif': ['var(--font-public-sans)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-public-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-plex-mono)', 'monospace'],
       },
       typography: {
         DEFAULT: {
           css: {
             color: 'var(--text-primary)',
-            fontFamily: 'Public Sans, Inter, system-ui, sans-serif',
+            fontFamily: 'var(--font-public-sans), system-ui, sans-serif',
             fontSize: '17px',
             lineHeight: '1.75',
           },

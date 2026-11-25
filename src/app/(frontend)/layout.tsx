@@ -5,6 +5,23 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { NavigationProgress } from '@/components/layout/NavigationProgress'
+import { Public_Sans, IBM_Plex_Mono } from 'next/font/google'
+
+// Self-hosted at build time by next/font: no render-blocking request to
+// Google, and the fonts are preloaded alongside the page.
+const publicSans = Public_Sans({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-public-sans',
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-plex-mono',
+})
 
 const envUrl = process.env.NEXT_PUBLIC_SITE_URL
 const siteUrl = envUrl && !envUrl.includes('placeholder.com') ? envUrl : 'https://instantlyfeed.com'
@@ -47,7 +64,7 @@ export default async function FrontendLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="light" className={`${publicSans.variable} ${plexMono.variable}`}>
       <body>
         <NavigationProgress />
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

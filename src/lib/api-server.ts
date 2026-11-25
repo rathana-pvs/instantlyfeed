@@ -191,15 +191,17 @@ export async function getBreakingArticles(): Promise<Article[]> {
   return cachedGetBreakingArticles()
 }
 
+// Keyed by slug (not id) so article pages can fetch this in parallel with the
+// article itself instead of waiting for it.
 const cachedGetRelatedArticles = unstable_cache(
-  async (articleId: string | number): Promise<Article[]> => {
+  async (excludeSlug: string): Promise<Article[]> => {
     try {
       const payload = await getPayloadClient()
       const result = await payload.find({
         collection: 'articles',
         where: {
           status: { equals: 'published' },
-          id: { not_equals: articleId },
+          slug: { not_equals: excludeSlug },
         },
         limit: 3,
         depth: 2,
@@ -208,15 +210,15 @@ const cachedGetRelatedArticles = unstable_cache(
       })
       return (result.docs || []).map((d: any) => normalizeDoc<Article>(d))
     } catch (error) {
-      warnDb(`getRelatedArticles(${articleId})`, error)
+      warnDb(`getRelatedArticles("${excludeSlug}")`, error)
       return []
     }
   },
-  ['related-articles'],
+  ['related-articles-by-slug'],
   { tags: ['articles'], revalidate: 60 }
 )
 
-export async function getRelatedArticles(articleId: string | number): Promise<Article[]> {
+export async function getRelatedArticles(excludeSlug: string): Promise<Article[]> {
   if (isBuildTime) return []
-  return cachedGetRelatedArticles(articleId)
+  return cachedGetRelatedArticles(excludeSlug)
 }

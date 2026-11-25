@@ -187,7 +187,6 @@ export function InfiniteArticleScroll({ initialArticle, initialRelated }: Infini
                        <AuthorChip
                           author={article.author || null}
                           date={article.publishedAt}
-                          readTime={article.readTime}
                           size="lg"
                           className="article-hero-chip"
                         />

@@ -14,6 +14,7 @@ function resolveUrl(baseUrl: string, relativeUrl: string): string {
 
 async function scrapeUrlDirectly(url: string) {
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(PAGE_TIMEOUT_MS),
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -768,6 +769,55 @@ For content summarization and AI formatting, follow these strict editorial rules
 
 Always respond with valid JSON only. No markdown, no explanations outside the JSON.`
 
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+const PAGE_TIMEOUT_MS = 20_000
+const IMAGE_TIMEOUT_MS = 15_000
+const OEMBED_TIMEOUT_MS = 8_000
+
+/**
+ * Download a scraped image into the Media collection. If the download fails or
+ * times out, fall back to an external-URL media doc. Returns the media id, or
+ * null if both attempts fail.
+ */
+async function importScrapedImage(payload: any, src: string, alt: string, filePrefix: string) {
+  try {
+    const imageRes = await fetch(src, {
+      headers: { 'User-Agent': BROWSER_UA },
+      signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS),
+    })
+    if (!imageRes.ok) {
+      throw new Error(`Failed to fetch image: Status ${imageRes.status}`)
+    }
+    const buffer = Buffer.from(await imageRes.arrayBuffer())
+    const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
+    let ext = contentType.split('/')[1] || 'jpg'
+    ext = ext.split(';')[0].replace('+xml', '').trim()
+    if (!['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'].includes(ext)) {
+      ext = 'jpg'
+    }
+    const filename = `${filePrefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}.${ext}`
+
+    const mediaDoc = await payload.create({
+      collection: 'media',
+      data: { alt, source: 'local' },
+      file: { data: buffer, name: filename, mimetype: contentType, size: buffer.length },
+    })
+    return mediaDoc.id
+  } catch (imgErr) {
+    console.error('Failed to download scraped image, trying external fallback:', src, imgErr)
+    try {
+      const mediaDoc = await payload.create({
+        collection: 'media',
+        data: { alt, source: 'external', externalUrl: src },
+      })
+      return mediaDoc.id
+    } catch (extErr) {
+      console.error('Failed to create external image fallback:', extErr)
+      return null
+    }
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const payload = await getPayloadClient()
@@ -790,121 +840,37 @@ export async function POST(req: NextRequest) {
       const result = await scrapeUrlDirectly(url) as any
       const blocks = result.blocks || []
 
-      // 1. Download cover image
-      if (result.scrapedImageUrl) {
-        try {
-          const imageRes = await fetch(result.scrapedImageUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
-          })
-          if (imageRes.ok) {
-            const arrayBuffer = await imageRes.arrayBuffer()
-            const buffer = Buffer.from(arrayBuffer)
-            const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
-            let ext = contentType.split('/')[1] || 'jpg'
-            ext = ext.split(';')[0].replace('+xml', '').trim()
-            if (!['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'].includes(ext)) {
-              ext = 'jpg'
-            }
-            const filename = `scraped-${Date.now()}.${ext}`
-            
-            const mediaDoc = await payload.create({
-              collection: 'media',
-              data: {
-                alt: result.title || 'Scraped Image',
-                source: 'local',
-              },
-              file: {
-                data: buffer,
-                name: filename,
-                mimetype: contentType,
-                size: buffer.length,
-              }
-            })
-            result.coverImage = mediaDoc.id
-          } else {
-            throw new Error(`Failed to fetch cover image: Status ${imageRes.status}`)
-          }
-        } catch (imgErr) {
-          console.error('Failed to download scraped cover image, trying external fallback:', imgErr)
-          try {
-            const mediaDoc = await payload.create({
-              collection: 'media',
-              data: {
-                alt: result.title || 'Scraped Image',
-                source: 'external',
-                externalUrl: result.scrapedImageUrl
-              }
-            })
-            result.coverImage = mediaDoc.id
-          } catch (extErr) {
-            console.error('Failed to create external cover image fallback:', extErr)
-          }
-        }
-      }
+      // 1–3. Cover image, inline images and Twitter/X embeds are independent,
+      // so fetch them all concurrently instead of one after another.
+      const coverSrc: string | undefined = result.scrapedImageUrl
 
-      // 2. Download inline images
-      for (const block of blocks) {
-        if (block.type === 'image' && block.src) {
-          try {
-            const imageRes = await fetch(block.src, {
-              headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }
-            })
-            if (imageRes.ok) {
-              const arrayBuffer = await imageRes.arrayBuffer()
-              const buffer = Buffer.from(arrayBuffer)
-              const contentType = imageRes.headers.get('content-type') || 'image/jpeg'
-              let ext = contentType.split('/')[1] || 'jpg'
-              ext = ext.split(';')[0].replace('+xml', '').trim()
-              if (!['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'].includes(ext)) {
-                ext = 'jpg'
-              }
-              const filename = `scraped-inline-${Date.now()}-${Math.floor(Math.random() * 1000)}.${ext}`
-              
-              const mediaDoc = await payload.create({
-                collection: 'media',
-                data: {
-                  alt: block.alt || result.title || 'Scraped Inline Image',
-                  source: 'local',
-                },
-                file: {
-                  data: buffer,
-                  name: filename,
-                  mimetype: contentType,
-                  size: buffer.length,
-                }
-              })
-              block.mediaId = mediaDoc.id
-            } else {
-              throw new Error(`Failed to fetch inline image: Status ${imageRes.status}`)
-            }
-          } catch (imgErr) {
-            console.error('Failed to download inline image, trying external fallback:', block.src, imgErr)
-            try {
-              const mediaDoc = await payload.create({
-                collection: 'media',
-                data: {
-                  alt: block.alt || result.title || 'Scraped Inline Image',
-                  source: 'external',
-                  externalUrl: block.src
-                }
-              })
-              block.mediaId = mediaDoc.id
-            } catch (extErr) {
-              console.error('Failed to create external inline image fallback:', extErr)
-            }
-          }
+      const coverTask = coverSrc
+        ? importScrapedImage(payload, coverSrc, result.title || 'Scraped Image', 'scraped')
+            .then((id) => { if (id != null) result.coverImage = id })
+        : Promise.resolve()
+
+      const blockTasks = blocks.map(async (block: any, i: number) => {
+        // Inline copies of the cover are dropped below; don't download them twice.
+        if (block.type === 'image' && block.src && block.src !== coverSrc) {
+          const id = await importScrapedImage(
+            payload,
+            block.src,
+            block.alt || result.title || 'Scraped Inline Image',
+            `scraped-inline-${i}`,
+          )
+          if (id != null) block.mediaId = id
         }
 
-        // 3. Resolve Twitter/X embeds using the public oEmbed API
+        // Resolve Twitter/X embeds using the public oEmbed API
         if (block.type === 'twitter' && block.url) {
           try {
             const oEmbedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(block.url)}&omit_script=true`
-            const embedRes = await fetch(oEmbedUrl)
+            const embedRes = await fetch(oEmbedUrl, { signal: AbortSignal.timeout(OEMBED_TIMEOUT_MS) })
             if (embedRes.ok) {
               const embedData = await embedRes.json()
               block.author = embedData.author_name || ''
               block.authorHandle = embedData.author_url ? '@' + embedData.author_url.split('/').pop() : '@x'
-              
+
               if (embedData.html) {
                 const tweet$ = cheerio.load(embedData.html)
                 block.tweetText = tweet$('p').text().trim() || block.text
@@ -918,11 +884,12 @@ export async function POST(req: NextRequest) {
             block.tweetText = block.text || 'Twitter content'
           }
         }
-      }
+      })
+
+      await Promise.all([coverTask, ...blockTasks])
 
       // 4. Deduplicate cover and inline images
       const coverMediaId = result.coverImage
-      const coverSrc = result.scrapedImageUrl
 
       const dedupedBlocks = blocks.filter((block: any) => {
         if (block.type !== 'image') return true

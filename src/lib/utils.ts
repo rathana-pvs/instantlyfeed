@@ -24,11 +24,6 @@ export function formatRelativeDate(dateString: string, localeCode = 'en'): strin
   }
 }
 
-export function calcReadTime(text: string): number {
-  const wordCount = text.trim().split(/\s+/).length
-  return Math.max(1, Math.ceil(wordCount / 200))
-}
-
 export function truncate(str: string | undefined | null, maxLength: number): string {
   if (!str) return ''
   if (str.length <= maxLength) return str

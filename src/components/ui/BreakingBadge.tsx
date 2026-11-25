@@ -11,7 +11,7 @@ export function BreakingBadge({ className }: { className?: string }) {
       style={{
         background: 'var(--accent-red-bright)',
         color: '#fff',
-        fontFamily: 'IBM Plex Mono, monospace',
+        fontFamily: 'var(--font-plex-mono), monospace',
         fontSize: '9px',
         fontWeight: 700,
         letterSpacing: '0.1em',

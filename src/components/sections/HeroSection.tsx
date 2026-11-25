@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { Article } from '@/types'
 import { AuthorChip } from '@/components/ui/AuthorChip'
 import { BreakingBadge } from '@/components/ui/BreakingBadge'
-import { dict } from '@/lib/i18n'
 import { getMediaUrl } from '@/lib/utils'
 
 interface HeroSectionProps {
@@ -77,7 +76,6 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                 <AuthorChip
                   author={hero.author || null}
                   date={hero.publishedAt}
-                  readTime={hero.readTime}
                   size="md"
                 />
               </div>
@@ -164,7 +162,6 @@ export function HeroSection({ hero, secondary }: HeroSectionProps) {
                               {article.author.name}
                             </span>
                           )}
-                          {article.readTime && <span>· {article.readTime} min read</span>}
                         </div>
                       </div>
                     </Link>

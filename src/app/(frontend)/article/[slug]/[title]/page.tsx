@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
+import { after } from 'next/server'
+import { sql } from '@payloadcms/db-postgres'
 import { getArticle, getRelatedArticles } from '@/lib/api-server'
 import { getPayloadClient } from '@/lib/payload'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
@@ -65,39 +67,30 @@ export default async function DynamicArticlePage({ params }: PageProps) {
   const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2073357'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2073350'
 
-  const article = await getArticle(slug)
+  const [article, relatedArticles] = await Promise.all([
+    getArticle(slug),
+    getRelatedArticles(slug),
+  ])
   if (!article) notFound()
 
-  const relatedArticles = await getRelatedArticles(article.id)
   const heroImage = getMediaUrl(article.coverImage)
 
-  // Track the click on the server side
-  try {
-    const headersList = await headers()
-    const userAgent = headersList.get('user-agent') || ''
-    const isBot = /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit/i.test(userAgent)
-
-    if (!isBot) {
-      const payload = await getPayloadClient()
-      const shareLinkResult = await payload.find({
-        collection: 'share-links' as any,
-        where: { key: { equals: key } },
-        limit: 1,
-      })
-
-      const shareLink = shareLinkResult.docs[0]
-      if (shareLink) {
-        await payload.update({
-          collection: 'share-links' as any,
-          id: shareLink.id,
-          data: {
-            clicks: (shareLink.clicks || 0) + 1,
-          },
-        })
+  // Count the share-link click after the response is sent, so the reader never
+  // waits on it. A single atomic UPDATE replaces the old find + update pair
+  // (which also lost counts under concurrent clicks).
+  const userAgent = (await headers()).get('user-agent') || ''
+  const isBot = /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit/i.test(userAgent)
+  if (!isBot) {
+    after(async () => {
+      try {
+        const payload = await getPayloadClient()
+        await payload.db.drizzle.execute(
+          sql`UPDATE share_links SET clicks = COALESCE(clicks, 0) + 1, updated_at = now() WHERE key = ${key}`
+        )
+      } catch (e) {
+        console.error('Error tracking share link click:', e)
       }
-    }
-  } catch (e) {
-    console.error('Error tracking share link click:', e)
+    })
   }
 
   const jsonLd = {
@@ -174,7 +167,6 @@ export default async function DynamicArticlePage({ params }: PageProps) {
                <AuthorChip
                   author={article.author || null}
                   date={article.publishedAt}
-                  readTime={article.readTime}
                   size="lg"
                   className="article-hero-chip"
                 />

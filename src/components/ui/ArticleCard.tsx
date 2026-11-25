@@ -8,7 +8,6 @@ import { AuthorChip } from './AuthorChip'
 import { BreakingBadge } from './BreakingBadge'
 import { CategoryBadge } from './CategoryBadge'
 import { truncate, getMediaUrl } from '@/lib/utils'
-import { dict } from '@/lib/i18n'
 
 interface ArticleCardProps {
   article: Article
@@ -66,7 +65,6 @@ export function ArticleCard({
                   {article.author.name}
                 </span>
               )}
-              {article.readTime && <span>· {article.readTime} {dict.minRead}</span>}
             </div>
           </div>
         </Link>
@@ -118,7 +116,6 @@ export function ArticleCard({
               <AuthorChip
                 author={article.author || null}
                 date={article.publishedAt}
-                readTime={article.readTime}
                 size="md"
               />
             </div>
@@ -172,7 +169,6 @@ export function ArticleCard({
             <AuthorChip
               author={article.author || null}
               date={article.publishedAt}
-              readTime={article.readTime}
               size="sm"
             />
           </div>

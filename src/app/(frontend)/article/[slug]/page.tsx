@@ -75,10 +75,11 @@ export default async function ArticlePage({ params }: PageProps) {
   const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2073357'
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2073350'
 
-  const article = await getArticle(slug)
+  const [article, relatedArticles] = await Promise.all([
+    getArticle(slug),
+    getRelatedArticles(slug),
+  ])
   if (!article) notFound()
-
-  const relatedArticles = await getRelatedArticles(article.id)
   const heroImage = getMediaUrl(article.coverImage)
 
   const jsonLd = {
@@ -155,7 +156,6 @@ export default async function ArticlePage({ params }: PageProps) {
                <AuthorChip
                   author={article.author || null}
                   date={article.publishedAt}
-                  readTime={article.readTime}
                   size="lg"
                   className="article-hero-chip"
                 />
