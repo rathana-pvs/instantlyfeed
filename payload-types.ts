@@ -168,9 +168,6 @@ export interface Article {
   isBreaking?: boolean | null;
   isFeatured?: boolean | null;
   publishedAt?: string | null;
-  /**
-   * Auto-calculated
-   */
   readTime?: number | null;
   og?: {
     metaTitle?: string | null;

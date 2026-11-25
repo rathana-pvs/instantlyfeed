@@ -267,7 +267,7 @@ export function serializeLexical(nodes: Node[], keyPrefix: string = 'node'): JSX
         return (
           <Tag 
             key={nodeKey} 
-            className="mb-5 text-base sm:text-lg leading-relaxed"
+            className="mb-5 text-[17px] sm:text-lg leading-relaxed"
             style={{ color: 'var(--text-secondary)' }}
           >
             {children}

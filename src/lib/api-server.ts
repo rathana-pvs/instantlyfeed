@@ -203,7 +203,7 @@ const cachedGetRelatedArticles = unstable_cache(
           status: { equals: 'published' },
           slug: { not_equals: excludeSlug },
         },
-        limit: 3,
+        limit: 4,
         depth: 2,
         sort: '-publishedAt',
         select: LIST_SELECT,

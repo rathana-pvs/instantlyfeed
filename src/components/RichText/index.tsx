@@ -80,6 +80,7 @@ export const RichText = ({
   let p1EndIndex = nodes.length // index after paragraph 1
   let p2EndIndex = nodes.length // index after paragraph 2
   let p3EndIndex = nodes.length // index after paragraph 3
+  let p6EndIndex = nodes.length // index after paragraph 6
 
   for (let i = 0; i < nodes.length; i++) {
     if (nodes[i].type === 'paragraph') {
@@ -87,6 +88,7 @@ export const RichText = ({
       if (paragraphCount === 1) p1EndIndex = i + 1
       if (paragraphCount === 2) p2EndIndex = i + 1
       if (paragraphCount === 3) p3EndIndex = i + 1
+      if (paragraphCount === 6) p6EndIndex = i + 1
     }
   }
 
@@ -144,10 +146,26 @@ export const RichText = ({
     )
   }
 
-  // Paragraph 4+
-  const restNodes = nodes.slice(p3EndIndex)
-  if (restNodes.length > 0) {
-    bottomElements.push(...serializeLexical(restNodes, 'bot-p4-plus'))
+  // In-Article Ad 3 sits after paragraph 6, but only when at least two more
+  // paragraphs follow — never directly before the end-of-article feed ad.
+  const hasThirdAd = !!tertiaryWidgetId && paragraphCount >= 8
+
+  // Paragraphs 4–6 (or 4+ when there is no third ad)
+  const midNodes = nodes.slice(p3EndIndex, hasThirdAd ? p6EndIndex : nodes.length)
+  if (midNodes.length > 0) {
+    bottomElements.push(...serializeLexical(midNodes, 'bot-p4-plus'))
+  }
+
+  if (hasThirdAd) {
+    bottomElements.push(
+      <div key={`ad-inarticle-3-wrap`} className="my-4 w-full flex justify-center items-center">
+        <AdskeeperWidget key={`ad-inarticle-3`} widgetId={tertiaryWidgetId} className="!my-0" />
+      </div>
+    )
+    const tailNodes = nodes.slice(p6EndIndex)
+    if (tailNodes.length > 0) {
+      bottomElements.push(...serializeLexical(tailNodes, 'bot-p7-plus'))
+    }
   }
 
   // ─── Collapsed state: primary ad + paragraph 1 + Continue Reading button ───

@@ -21,7 +21,7 @@ export function RelatedArticles({ articles }: RelatedArticlesProps) {
 
       {/* Text-Only Editorial Links */}
       <ul className="divide-y divide-[var(--border)]">
-        {articles.slice(0, 3).map((article) => {
+        {articles.slice(0, 4).map((article) => {
           return (
             <li key={article.id} className="py-2.5 first:pt-1 last:pb-1">
               <Link

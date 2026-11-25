@@ -73,6 +73,7 @@ export default async function ArticlePage({ params }: PageProps) {
   const widgetSidebar = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_SIDEBAR || '2073359'
   const widgetInArticle1 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_1 || '2073352'
   const widgetInArticle2 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_2 || '2073357'
+  const widgetInArticle3 = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_IN_ARTICLE_3 || ''
   const widgetBottomFeed = process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_BOTTOM_FEED || process.env.NEXT_PUBLIC_ADS_KEEPER_WIDGET_FEED || '2073350'
 
   const [article, relatedArticles] = await Promise.all([
@@ -200,6 +201,7 @@ export default async function ArticlePage({ params }: PageProps) {
                   articleTitle={article.title}
                   adWidgetId={widgetInArticle1}
                   adWidgetId2={widgetInArticle2}
+                  adWidgetId3={widgetInArticle3}
                   feedWidgetId={widgetBottomFeed}
                 />
               ) : (
@@ -208,6 +210,10 @@ export default async function ArticlePage({ params }: PageProps) {
                 </p>
               )}
             </div>
+
+            {/* Next-read links: keeps phone readers on-site for another pageview
+                (the sidebar that offered this is hidden below 1024px). */}
+            <RelatedArticles articles={relatedArticles} />
 
             {/* Feed Bottom Content Widget - Inside main content column */}
             <div className="mt-4">

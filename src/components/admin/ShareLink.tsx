@@ -24,7 +24,9 @@ export const ShareLink: React.FC = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && slugValue) {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      // The admin panel runs on the public domain, so its origin is always right
+      // (a build-time NEXT_PUBLIC_SITE_URL can be stale).
+      const siteUrl = window.location.origin
       setShareUrl(`${siteUrl}/article/${slugValue}`)
     } else {
       setShareUrl('')
@@ -116,7 +118,9 @@ export const ShareLink: React.FC = () => {
 
   const getFullUrl = (key: string) => {
     if (typeof window !== 'undefined') {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      // The admin panel runs on the public domain, so its origin is always right
+      // (a build-time NEXT_PUBLIC_SITE_URL can be stale).
+      const siteUrl = window.location.origin
       return `${siteUrl}/article/${key}/${slugValue || ''}`
     }
     return `/article/${key}/${slugValue || ''}`

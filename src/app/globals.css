@@ -169,7 +169,8 @@ body {
 /* ─── Article Body Typography ─────────────────────────────────── */
 .article-body {
   font-family: var(--font-public-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: clamp(16px, 0.9vw + 13px, 18px);
+  /* 17px floor: easier reading on phones without changing desktop (18px) */
+  font-size: clamp(17px, 0.5vw + 15px, 18px);
   line-height: 1.75;
   color: var(--text-secondary);
   font-weight: 400;
