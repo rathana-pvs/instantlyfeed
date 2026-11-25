@@ -4,6 +4,18 @@ import { VideoEmbed } from '../blocks/VideoEmbed'
 import { slugify } from '../lib/utils'
 import { revalidateTag } from 'next/cache'
 
+function countLexicalWords(node: any): number {
+  if (!node) return 0
+  let count = 0
+  if (node.type === 'text' && typeof node.text === 'string') {
+    count += node.text.split(/\s+/).filter(Boolean).length
+  }
+  if (Array.isArray(node.children)) {
+    for (const child of node.children) count += countLexicalWords(child)
+  }
+  return count
+}
+
 export const Articles: CollectionConfig = {
   slug: 'articles',
   admin: {
@@ -35,8 +47,9 @@ export const Articles: CollectionConfig = {
         }
         
         if (data.content) {
-          const contentStr = JSON.stringify(data.content)
-          const wordCount = contentStr.split(/\s+/).length
+          // Count only the words in Lexical text nodes — stringifying the whole
+          // JSON tree counted keys/format metadata and inflated read time.
+          const wordCount = countLexicalWords(data.content?.root)
           data.readTime = Math.max(1, Math.ceil(wordCount / 200))
         }
 

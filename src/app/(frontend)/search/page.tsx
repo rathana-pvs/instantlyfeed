@@ -21,7 +21,7 @@ export default function SearchPage() {
   useEffect(() => {
     async function fetchData() {
       const [articlesData] = await Promise.all([
-        getArticles({ limit: 100 }),
+        getArticles({ limit: 100, summary: true }),
       ])
       setArticles(articlesData.docs)
       setLoading(false)

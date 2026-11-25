@@ -6,6 +6,8 @@ export async function getArticles(params?: {
   limit?: number
   page?: number
   where?: Record<string, any>
+  /** Omit the rich-text body and SEO groups (for card/list views). */
+  summary?: boolean
 }): Promise<PaginatedArticles> {
   try {
     const searchParams = new URLSearchParams()
@@ -13,6 +15,12 @@ export async function getArticles(params?: {
     if (params?.page) searchParams.set('page', String(params.page))
     searchParams.set('where[status][equals]', 'published')
     searchParams.set('depth', '2')
+    searchParams.set('sort', '-publishedAt')
+    if (params?.summary) {
+      searchParams.set('select[content]', 'false')
+      searchParams.set('select[og]', 'false')
+      searchParams.set('select[meta]', 'false')
+    }
 
     const res = await fetch(`/api/articles?${searchParams}`)
     if (!res.ok) throw new Error('Failed to fetch articles')
@@ -36,7 +44,7 @@ export async function getArticles(params?: {
 
 export async function getArticle(slug: string): Promise<Article | null> {
   try {
-    const res = await fetch(`/api/articles?where[slug][equals]=${slug}&depth=2&limit=1`)
+    const res = await fetch(`/api/articles?where[slug][equals]=${encodeURIComponent(slug)}&depth=2&limit=1`)
     if (!res.ok) return null
     const data = await res.json()
     return data.docs[0] || null

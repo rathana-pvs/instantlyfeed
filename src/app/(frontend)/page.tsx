@@ -6,7 +6,7 @@ import { OpinionSection } from '@/components/sections/OpinionSection'
 import { MostRead } from '@/components/sections/MostRead'
 import { BreakingTicker } from '@/components/layout/BreakingTicker'
 import AdskeeperWidget from '@/components/ads/AdskeeperWidget'
-import { getArticles, getFeatured } from '@/lib/api-server'
+import { getArticles } from '@/lib/api-server'
 import { Article } from '@/types'
 import { mockArticles } from '@/lib/mockData'
 
@@ -18,20 +18,17 @@ export const metadata: Metadata = {
 export const revalidate = 60
 
 export default async function HomePage() {
-  const [{ hero: dbHero, secondary: dbSecondary }, allArticles] = await Promise.all([
-    getFeatured(),
-    getArticles({ limit: 40 }),
-  ])
+  // One query feeds every section. The hero + secondary stories are simply the
+  // newest published articles, which is exactly the head of this list.
+  const allArticles = await getArticles({ limit: 40 })
 
   // Use database articles if present; otherwise fallback to rich dummy articles
   const articles: Article[] = (allArticles.docs && allArticles.docs.length > 0)
     ? (allArticles.docs as Article[])
     : mockArticles
 
-  const hero = dbHero || articles[0] || null
-  const secondary = (dbSecondary && dbSecondary.length >= 4)
-    ? dbSecondary
-    : articles.filter((a) => a.id !== hero?.id).slice(0, 4)
+  const hero = articles[0] || null
+  const secondary = articles.slice(1, 5)
 
   // Breaking news for ticker
   const breakingArticles = articles.filter((a) => a.isBreaking)
