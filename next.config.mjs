@@ -75,12 +75,18 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: '/api/media/file/:path*',
-        destination: '/media/:path*',
-      },
-    ]
+    return {
+      // `next start` only serves public/ files that existed at build time, so
+      // uploads made after a deploy 404 for the image optimizer (which fetches
+      // /media/* from this server, bypassing nginx). Fall back to Payload's
+      // runtime file route, which reads public/media from disk on each request.
+      fallback: [
+        {
+          source: '/media/:path*',
+          destination: '/api/media/file/:path*',
+        },
+      ],
+    }
   },
 }
 
